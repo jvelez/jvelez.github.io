@@ -18,7 +18,7 @@ $(document).ready(function()
 
 	function GetData()
 	{
-		$.get("http://ipinfo.io", function(data)
+		$.get("https://ipinfo.io", function(data)
 		{
 			//GET LOCATION DATA
 			var city = data["city"];
