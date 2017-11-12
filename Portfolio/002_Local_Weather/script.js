@@ -33,7 +33,7 @@ $(document).ready(function()
 			$("#loc").html("<b>"+data["city"]+", "+countries[data["country"]]+"</b>");
 
 			//GET WEATHER DATA
-			$.get('http://api.openweathermap.org/data/2.5/weather?lat='+lat+'&lon='+lon+"&units="+units+'&appid=e320abf9bbeb712f872a4f6df2dfe1f0',
+			$.get('https://api.openweathermap.org/data/2.5/weather?lat='+lat+'&lon='+lon+"&units="+units+'&appid=e320abf9bbeb712f872a4f6df2dfe1f0',
 			function(weather)
 			{
 				//GET WEATHER
@@ -42,7 +42,7 @@ $(document).ready(function()
 				var wind = weather["wind"]["deg"];
 				winDir = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.floor(wind/ 45)];
 				windSpeed = weather.wind.speed;
-				var imgsrc = '"http://openweathermap.org/img/w/' + weather["weather"][0].icon + '.png"';
+				var imgsrc = '"https://openweathermap.org/img/w/' + weather["weather"][0].icon + '.png"';
 
 				//UPDATE HTML
 				$('#weather').html(description);
