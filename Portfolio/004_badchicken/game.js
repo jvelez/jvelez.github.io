@@ -388,7 +388,7 @@ var Resources =
 	Images: {},
 	Sounds: {},
 	
-	Load: function()
+	Load: function(callback)
 	{
 		//LOAD IMAGES
 		this.Images["BACKGROUND"] = LoadImage("assets/visuals/stars.jpg");
@@ -419,11 +419,14 @@ var Resources =
 		this.Sounds["SWORDS"] =    [LoadAudio("assets/audio/swords.wav",4),0];
 		this.Sounds["TITLE_MUSIC"] = [LoadAudio("assets/audio/title_music.wav",1),0];
 		this.Sounds["GAMEPLAY_MUSIC"] = [LoadAudio("assets/audio/gameplay_music.wav",1),0];
+		
+		//START THE GAME WHEN THE FINAL ASSET LOADS
+		this.Sounds["GAMEPLAY_MUSIC"][0][0].onload = Start_Game();
 	}
 }
 
 //LOAD THE GAME RESOURCES
-Resources.Load();
+//Resources.Load();
 
 //PLAY A SOUND AT A GIVEN VOLUME DEFAULT IS 1//
 function Play_Sound(sound,vol=1,lp=false)
@@ -506,9 +509,8 @@ class Background extends GameObject
 		super();
 		this.SpeedX = sx;
 		this.SpeedY = sy;
-		this.Width = 640;//Resources.Images[this.imgindex].naturalWidth;
-		this.Height = 480;//Resources.Images[this.imgindex].naturalHeight;
-		console.log(this.PositionX+" "+this.PositionY);
+		this.Width = 640;
+		this.Height = 480;
 	}
 
 	// Update the Animation
@@ -1365,7 +1367,7 @@ class TitleScreen
 
 	HandleInput()
 	{
-		if(KEYS[KName["Space"]] || KEYS[KName["Enter"]])
+		if(KEYS[KName["Space"]] || KEYS[KName["Enter"]] || TOUCHING[0] || TOUCHING[1])
 		{
 			GameState = GAME_STATES["GAMEPLAY"];
 			Play_Sound(Resources.Sounds["GUNSHOT"]);
@@ -1482,8 +1484,14 @@ ScreenManager.AddScreen(new GamePlayScreen());
 ScreenManager.AddScreen(new PauseScreen());
 ScreenManager.AddScreen(new GameOverScreen());
 
+//FUNCTION THAT STARTS THEGAME
+function Start_Game()
+{
 //START PLAYING THE TITLE MUSIC
 Play_Sound(Resources.Sounds["TITLE_MUSIC"],1,loop);
+// Start things off
+requestAnimationFrame(GameLoop);
+}
 
 //THIS IS THE GAME LOOP
 function GameLoop(timestamp)
@@ -1521,7 +1529,8 @@ function GameLoop(timestamp)
     ScreenManager.Draw();
     requestAnimationFrame(GameLoop);
 }
- 
-// Start things off
-//setInterval(GameLoop, 1000/fps);
-requestAnimationFrame(GameLoop);
+
+//LOAD GAME RESOURCES//
+//then start the game//
+Resources.Load();
+
