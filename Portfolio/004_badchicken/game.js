@@ -49,9 +49,6 @@ var mobilecheck = function()
 };
 MOBILE = mobilecheck();
 
-
-
-
 //SET ALL THE KEYS TO FALSE//
 function ResetKeys() { for(var i=0; i<KEYS.length; i++) { KEYS[i]=false; } }
 
@@ -388,7 +385,7 @@ var Resources =
 	Images: {},
 	Sounds: {},
 	
-	Load: function(callback)
+	Load: function()
 	{
 		//LOAD IMAGES
 		this.Images["BACKGROUND"] = LoadImage("assets/visuals/stars.jpg");
@@ -1488,7 +1485,7 @@ ScreenManager.AddScreen(new GameOverScreen());
 function Start_Game()
 {
 //START PLAYING THE TITLE MUSIC
-Play_Sound(Resources.Sounds["TITLE_MUSIC"],1,loop);
+Play_Sound(Resources.Sounds["TITLE_MUSIC"],1,true);
 // Start things off
 requestAnimationFrame(GameLoop);
 }
