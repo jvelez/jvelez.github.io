@@ -3,6 +3,8 @@ var EXIT = false;
 var GameState = 0;
 var Level = 1;
 var Combo = 0;
+var Kills = 0;
+var MAX_SCORE = 9999999999;
 
 //GAME LOOP GLOBAL VARIABLES
 var lastFrameTimeMs = 0;
@@ -22,9 +24,6 @@ var SW = canvas.width;
 var SH = canvas.height;
 
 //INPUT GLOBAL VARIABLES
-var MOBILE = false;
-var TXY = [{x:0,y:0},{x:0,y:0}];
-var TOUCHING = [ false, false ];
 var KEYS = Array(222);
 var KName = 
 {
@@ -40,72 +39,18 @@ var KName =
 	'F2':113
 }
 
-//CHECK FOR MOBILE BROWSER
-var mobilecheck = function() 
-{
-  var check = false;
-  (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);
-  return check;
-};
-MOBILE = mobilecheck();
-
 //SET ALL THE KEYS TO FALSE//
 function ResetKeys() { for(var i=0; i<KEYS.length; i++) { KEYS[i]=false; } }
 
 //LISTEN FOR INPUT EVENTS
 document.addEventListener("keydown", KeyPressed, false);
 document.addEventListener("keyup", KeyReleased, false);
-if(MOBILE==true)
-{
-canvas.addEventListener("touchstart", TouchStartMove);
-canvas.addEventListener("touchmove", TouchStartMove);
-canvas.addEventListener("touchend", TouchEnded);
-//canvas.addEventListener("touchcancel", handleCancel);
-}
 
 //HANDLE PRESSED KEYS
 function KeyPressed(e) { KEYS[e.keyCode] = true; }
 
 //HANDLE RELEASED KEYS
 function KeyReleased(e) { KEYS[e.keyCode] = false; }
-
-//HANDLE TOUCH INPUT
-function TouchStartMove(e) 
-{
-    if(e.touches) 
-	{
-        TXY[0].x = e.touches[0].pageX - canvas.offsetLeft;
-        TYY[0].y = e.touches[0].pageY - canvas.offsetTop;
-		TOUCHING[0] = true;
-		
-		if(e.touches.length>1)
-		{
-			TXY[1].x = e.touches[1].pageX - canvas.offsetLeft;
-			TXY[1].y = e.touches[1].pageY - canvas.offsetTop;
-			TOUCHING[1] = true;
-		}
-        e.preventDefault();
-    }
-}
-
-function TouchEnded(e) 
-{
-    if(e.touches) 
-	{
-        TXY[0].x = e.touches[0].pageX - canvas.offsetLeft;
-        TYY[0].y = e.touches[0].pageY - canvas.offsetTop;
-		TOUCHING[0] = false;
-		
-		if(e.touches.length>1)
-		{
-			TXY[1].x = e.touches[1].pageX - canvas.offsetLeft;
-			TXY[1].y = e.touches[1].pageY - canvas.offsetTop;
-			TOUCHING[1] = false;
-		}
-        e.preventDefault();
-    }
-}
-
 
 //DRAW A RECTANGLE GIVEN POS X Y , WIDTH AND HEIGHT, COLOR AND FILL FLAG
 function Draw_Rect(x,y,w,h,color,fill = true)
@@ -153,15 +98,6 @@ function Draw_Text(font,color,x,y,text,fill=true)
 	ctx.strokeStyle = color;
 	if(fill) { ctx.fillText(text,x,y); }
 	else { ctx.strokeText(text,x,y); }
-}
-
-//GET THE VALUE BETWEEN TWO NUMBERS GIVEN P IS THE DISTANCE WHERE 0.5 IS HALFWAY
-function Interpolate(a,b,p = 0.5,clamp=0)
-{
-	var result =  a*p + b*(1-p);
-	if(clamp==-1){ return Math.floor(result); }
-	else if(clamp==0){ return result; }
-	else if(clamp==1){ return Math.ceil(result); }
 }
 
 //CAP A GIVEN VALUE N BETWEEN TO VALUES MIN AND MAX
@@ -222,48 +158,13 @@ class Color
 	}
 }
 
-//CONVENIENT RECTANGLE CLASS
-class Rectangle
-{
-	constructor(x,y,w,h)
-	{
-		this.posX = x;
-		this.posY = y;
-		this.width = w;
-		this.height = h;
-		this.top = y;
-		this.bottom = y+h;
-		this.left = x;
-		this.right = x+w;
-		this.centerX = x+w/2;
-		this.centerY = y+h/2;
-		this.wy = w*y;
-		this.hx = h*x;
-	}
-	
-	static Collision(A,B)
-	{
-		return !((A.bottom<B.top)||(B.bottom<A.top) || (A.right<B.left) || (B.right<A.left));
-	}
-	
-	static MinowskiSum(A,B)
-	{
-		var w = (A.width + B.width)*0.5;
-		var h = (A.height + B.height)*0.5;
-		var dx = A.centerX - B.centerX;
-		var dy = A.centerY - B.centerY;
-		
-		return new Rectangle(dx,dy,w,h);
-	}
-}
-
 //GUN RELATED GLOBAL VARIABLES
 var MAX_FIRE_POWER  = 6;
 var MAX_FIRE_RATE  = 17;
 var MAX_BARRELS = 5;
-var MAX_MAX_BULLETS = 100;
-var MAX_TOTAL_BULLETS = 9999;
-var MIN_RELOAD_TIME = 1;
+//var MAX_MAX_BULLETS = 100;
+//var MAX_TOTAL_BULLETS = 9999;
+//var MIN_RELOAD_TIME = 1;
 
 //CONVINIENT GUN CLASS DECLARATION//
 class Gun
@@ -272,77 +173,32 @@ class Gun
 	{
 		this.FirePower = 2;
 		this.FireRate = 5;
-		this.ReloadTime = 75;  //in frames
-		this.MaxBullets = 10;
-		this.TotalBullets = 100;
-		this.Bullets = 10;
-		this.Automatic = false; 
 		this.DelayTimer = 0;  
-		this.Fire = false; 
-		this.NoReload = true;
+		this.Fire = false;
 		this.Barrels = 1;
 	}
 
 	Shoot() 
 	{ 
-		if(!this.FireRate)
+		if(this.DelayTimer<=0)
 		{
-			return false;
+			this.DelayTimer = Math.floor(FPS/this.FireRate);
+			this.Fire = true;
+			return true;
 		}
-		if(this.NoReload)
-		{
-			if(this.DelayTimer<=0 && (this.Automatic? true : !this.Fire))
-			{
-				this.DelayTimer = Math.floor(FPS/this.FireRate);
-				this.Fire = true;
-				return true;
-			}
-		}
-		else
-		{
-			if(this.DelayTimer<=0 && this.Bullets>0 && (this.Automatic? true : !this.Fire))
-			{
-				this.Bullets--;
-				this.DelayTimer = FPS/this.FireRate;
-				this.Fire = true;
-				return true;
-			}
-		}
-		return false;  
+		else return false;
 	}
-        
-    CeaseFire() { this.Fire = false; }
-        
+	
     IsReady() { return this.DelayTimer == 0; }
         
     Update() { this.DelayTimer--; }
-        
-	Reload() 
-	{ 
-		this.Bullets = ((this.TotalBullets<this.MaxBullets)? this.TotalBullets : this.MaxBullets);
-		this.TotalBullets -= this.MaxBullets;
-		if(this.TotalBullets<0){ this.TotalBullets = 0; }
-	}
-        
-    AddBullets(bn) { this.TotalBullets += bn; }
-    UpgradeFireRate() { this.FireRate++; }
-    UpgradeFirePower() { this.FirePower++; }
-    UpgradeReloadTime() { this.ReloadTime--; if(this.ReloadTime<MIN_RELOAD_TIME){ this.ReloadTime = MIN_RELOAD_TIME;} }
-    UpgradeMaxBullets() { this.MaxBullets++; }
-    UpgradeAutomatic() { this.Automatic = true; }
-	UpgradeBarrels() { this.Barrels++; }
-	
-	MaxUpgrades()
-	{
-		this.FireRate = MAX_FIRE_RATE;
-		this.FirePower = MAX_FIRE_POWER;
-		this.ReloadTime = MIN_RELOAD_TIME;
-		this.MaxBullets = MAX_MAX_BULLETS; 
-	}
-		
+
+    UpgradeFireRate() { this.FireRate++; Cap(this.FireRate,5,MAX_FIRE_RATE);  }
+    UpgradeFirePower() { this.FirePower++; Cap(this.FirePower,2,MAX_FIRE_POWER); }
+	UpgradeBarrels() { this.Barrels++; Cap(this.Barrels,1,MAX_BARRELS); }
+
 	Reset(fp = 2)
 	{ 
-		this.Automatic = true;
 		this.FireRate = 5; 
 		this.FirePower = fp;
 		this.Barrels = 1;
@@ -353,13 +209,6 @@ class Gun
 		this.FireRate--;
 		this.FirePower--;
 		this.Barrels--;
-	}
-
-	Regulate()
-	{
-		this.FireRate = Cap(this.FireRate,5,MAX_FIRE_RATE);
-		this.FirePower = Cap(this.FirePower,2,MAX_FIRE_POWER);
-		this.Barrels = Cap(this.Barrels,1,MAX_BARRELS);
 	}
 };
 
@@ -388,42 +237,35 @@ var Resources =
 	Load: function()
 	{
 		//LOAD IMAGES
-		this.Images["BACKGROUND"] = LoadImage("assets/visuals/stars.jpg");
-		this.Images["EXPLOSION"] = LoadImage("assets/visuals/explosion.png");
-		this.Images["COIN"] = LoadImage("assets/visuals/coin.png");
-		this.Images["POWERUPS"] = LoadImage("assets/visuals/powerups.png");
-		this.Images["CHICKEN"] = LoadImage("assets/visuals/chicken.png");
-		this.Images["AK47"] = LoadImage("assets/visuals/ak47.png");
-		this.Images["HEALTH"] = LoadImage("assets/visuals/healthbar.png");
-		this.Images["ROAST"] = LoadImage("assets/visuals/roast.png");
-		this.Images["TIGER"] = LoadImage("assets/visuals/tiger.png");
-		this.Images["CROC"] = LoadImage("assets/visuals/crocodile.png");
-		this.Images["DOLPHIN"] = LoadImage("assets/visuals/dolphin.png");
-		this.Images["GRIFFIN"] = LoadImage("assets/visuals/griffin.png");
-		this.Images["BEAVER"] = LoadImage("assets/visuals/beaver.png");
-		this.Images["TITLE"] = LoadImage("assets/visuals/titlescreen.png");
-		this.Images["PRESS_START"] = LoadImage("assets/visuals/press_start.png");
-		this.Images["PAUSE"] = LoadImage("assets/visuals/pause.png");
-		this.Images["GAMEOVER"] = LoadImage("assets/visuals/gameover.png");
+		this.Images["BACKGROUND"] = LoadImage("assets/backgrounds.jpg");
+		this.Images["EXPLOSION"] = LoadImage("assets/explosion.png");
+		this.Images["COIN"] = LoadImage("assets/coin.png");
+		this.Images["POWERUPS"] = LoadImage("assets/powerups.png");
+		this.Images["CHICKEN"] = LoadImage("assets/chicken.png");
+		this.Images["AK47"] = LoadImage("assets/ak47.png");
+		this.Images["ROAST"] = LoadImage("assets/roast.png");
+		this.Images["TIGER"] = LoadImage("assets/tiger.png");
+		this.Images["CROC"] = LoadImage("assets/crocodile.png");
+		this.Images["DOLPHIN"] = LoadImage("assets/dolphin.png");
+		this.Images["GRIFFIN"] = LoadImage("assets/griffin.png");
+		this.Images["BEAVER"] = LoadImage("assets/beaver.png");
+		this.Images["PRESS_START"] = LoadImage("assets/press_start.png");
 
 		//LOAD SOUNDS// audio_array[] // audio_file_index
-		this.Sounds["PUNCH"] =     [LoadAudio("assets/audio/punch.wav",20),0];
-		this.Sounds["LASERSHOT"] = [LoadAudio("assets/audio/lasershot.wav",30),0];
-		this.Sounds["ROOSTER"] =   [LoadAudio("assets/audio/cantagallo.wav",1),0];
-		this.Sounds["GUNSHOT"] =   [LoadAudio("assets/audio/gunshot.wav",2),0];
-		this.Sounds["RECHARGE"] =  [LoadAudio("assets/audio/recharge.wav",10),0];
-		this.Sounds["COIN"] =      [LoadAudio("assets/audio/star.wav",10),0];
-		this.Sounds["SWORDS"] =    [LoadAudio("assets/audio/swords.wav",4),0];
-		this.Sounds["TITLE_MUSIC"] = [LoadAudio("assets/audio/title_music.wav",1),0];
-		this.Sounds["GAMEPLAY_MUSIC"] = [LoadAudio("assets/audio/gameplay_music.wav",1),0];
+		this.Sounds["PUNCH"] =     [LoadAudio("assets/punch.wav",20),0];
+		this.Sounds["LASERSHOT"] = [LoadAudio("assets/lasershot.wav",30),0];
+		this.Sounds["ROOSTER"] =   [LoadAudio("assets/cantagallo.wav",1),0];
+		this.Sounds["GUNSHOT"] =   [LoadAudio("assets/gunshot.wav",2),0];
+		this.Sounds["RECHARGE"] =  [LoadAudio("assets/recharge.wav",10),0];
+		this.Sounds["COIN"] =      [LoadAudio("assets/star.wav",10),0];
+		this.Sounds["SWORDS"] =    [LoadAudio("assets/swords.wav",4),0];
+		this.Sounds["TITLE_MUSIC"] = [LoadAudio("assets/title_music.wav",1),0];
+		this.Sounds["GAMEPLAY_MUSIC"] = [LoadAudio("assets/gameplay_music.wav",1),0];
 		
 		//START THE GAME WHEN THE FINAL ASSET LOADS
 		this.Sounds["GAMEPLAY_MUSIC"][0][0].onload = Start_Game();
 	}
-}
-
-//LOAD THE GAME RESOURCES
-//Resources.Load();
+};
 
 //PLAY A SOUND AT A GIVEN VOLUME DEFAULT IS 1//
 function Play_Sound(sound,vol=1,lp=false)
@@ -488,14 +330,6 @@ class GameObject
 	{
 		return this.IntersectsWithRect(go.PositionX, go.PositionY, go.Width, go.Height);
 	}
-	
-	//Reset(){}
-	//Load(){}
-	//HandleCollision(){}
-	//HandleInput(){}
-	//Update(){}
-	//Draw(){}
-	//Destroy(){}
 }
 
 //BACKGROND CLASS DECLARATION//
@@ -507,7 +341,7 @@ class Background extends GameObject
 		this.SpeedX = sx;
 		this.SpeedY = sy;
 		this.Width = 640;
-		this.Height = 480;
+		this.Height = 400;
 	}
 
 	// Update the Animation
@@ -515,23 +349,18 @@ class Background extends GameObject
 	{
 		this.PositionX += this.SpeedX;
 		this.PositionY += this.SpeedY;
-
 		var difX = this.Width - SW;
 		var difY = this.Height - SH;
 
-		if (this.SpeedX >= 0)//Going to the Right
+		//Going to the Right
+		if (this.SpeedX >= 0 && this.PositionX > SW)
 		{
-			if (this.PositionX > SW)
-			{
-				this.PositionX = -this.Width - difX;
-			}
+			this.PositionX = -this.Width - difX;
 		}
-		else //Going to the Left
+		//Going to the Left
+		else if (this.PositionX + this.Width <= 0)
 		{
-			if (this.PositionX + this.Width <= 0)
-			{
-				this.PositionX = SW + difX;
-			}
+			this.PositionX = SW + difX;
 		}
 	}
 
@@ -546,18 +375,16 @@ class Background extends GameObject
 			{
 				px = this.PositionX + i*this.Width;
 				py = this.PositionY + j*this.Height
-				ctx.drawImage(Resources.Images["BACKGROUND"],px,py);
+				ctx.drawImage(Resources.Images["BACKGROUND"],0,1200,this.Width,this.Height,px,py,this.Width,this.Height);
 			}
 		}
 	}
-
-	//Destroy(){}
 }
 
 //BULLET CLASS DECLARATION//
 class Bullet extends GameObject
 {
-	constructor(x=-10, y=-10, sx=0, sy=0, st=-1, p=1)
+	constructor(x=-1000, y=-1000, sx=0, sy=0, st=STATES["NULL"], p=0)
 	{
 		super();
 		this.Type = TYPES["BULLET"];
@@ -583,7 +410,7 @@ class Bullet extends GameObject
 	{
 		this.PositionX += this.SpeedX;
 		this.PositionY += this.SpeedY;
-		if(this.PositionX>SW || this.PositionX<0 || this.PositionY>SH || this.PositionY<0)
+		if(this.PositionX>SW || this.PositionX+this.Width<0 || this.PositionY>SH || this.PositionY+this.Height<0 || this.States==STATES["NULL"])
 		{
 			this.Active = false;
 			this.Solid = false;
@@ -600,7 +427,6 @@ class Bullet extends GameObject
 	{
 		var x = (this.PositionX-this.Width);
 		var y = (this.PositionY+this.Height);
-			
 		for(var i = this.Power*2; i>0; i--)
 		{
 			if(this.State ==  STATES["GOOD"])
@@ -763,7 +589,7 @@ class Enemy extends GameObject
 		this.State = RandomInt(0,4);
 		this.gun = new Gun();
 		this.gun.Reset(1);
-		this.gun.FireRate = RandomInt(1,Math.floor(Level/6)+4-this.State)
+		this.gun.FireRate = RandomInt(1,Math.floor(Level/6));
 		this.gun.FirePower = RandomInt(2,4);
 		this.ImgIndex = "TIGER";
 		switch(this.State)
@@ -797,7 +623,7 @@ class Enemy extends GameObject
 		this.PositionX = SW*1.25;
 		this.PositionY = RandomInt(1,(SH-this.Height));
 		this.SpeedY = 0;
-		this.SpeedX = -RandomInt(this.State+1,3+Math.ceil(Level/20));
+		this.SpeedX = -RandomInt(this.State+2,3+Math.ceil(Level/20));
 		this.Solid = true;
 		this.Active = true;
 		this.Type = TYPES["ENEMY"];
@@ -832,14 +658,18 @@ class Enemy extends GameObject
 			return (new Bullet(x,y,-10,0,STATES["BAD"],3));
 		}
 		//otherwise return a null bullet
-		else { return  (new Bullet(0,0,0,0,STATES["NULL"],0)); }
+		else { return  (new Bullet()); }
 	}
 
-	HandleCollision(ObjID)
+	HandleCollision(Object)
 	{
 		this.Solid = false;
 		this.Active = false;
-		if(ObjID==TYPES["BULLET"]){ Combo++; }
+		if(Object.Type==TYPES["BULLET"] && Object.State==STATES["GOOD"])
+		{ 
+			Combo++; 
+			Kills++;
+		}
 	}
 
 	Draw() 
@@ -885,14 +715,7 @@ class Player extends Enemy
 		
 		if(KEYS[KName["Left"]]) { this.SpeedX = -5; }
 		else if(KEYS[KName["Right"]]) { this.SpeedX = 5;}
-		
-		if(TOUCHING[0]) 
-		{ 
-			this.PositionX = TX0 - this.Width/2; 
-			this.PositionY = TX0 - this.Width/2; 
-		}
-		
-		//console.log("player input is handled");
+
 		//if(KEYS[KName["LShift"]]) { this.SpeedX *=2; this.SpeedY *=2; }
 	}
  
@@ -954,7 +777,13 @@ class Player extends Enemy
 			Play_Sound(Resources.Sounds["LASERSHOT"]); //al_play_sample(LaserShot,1,PositionX/float(SW)-0.5,2.7,ALLEGRO_PLAYMODE_ONCE,NULL);
 			return (new Bullet(x,y,15,0,STATES["GOOD"],this.gun.FirePower));
 		}
-		return  (new Bullet(0,0,0,0,STATES["NULL"],0));
+		return  (new Bullet());
+	}
+	
+	ModifyScore(val)
+	{
+		this.Score+=val;
+		if(this.Score>MAX_SCORE){ this.Score = MAX_SCORE; }
 	}
 
 	HandleCollision(Object)
@@ -971,12 +800,11 @@ class Player extends Enemy
 					case 3: this.Health+=15; if(this.Health>this.MaxHealth){this.Health=this.MaxHealth;} break; //HEALTH+
 					case 4: this.gun.UpgradeBarrels(); break; //BARREL+
 				}
-				this.gun.Regulate();
 				break;
 
 			case TYPES["COIN"]: 
 				Play_Sound(Resources.Sounds["COIN"]); //al_play_sample(Star,1,PositionX/float(SW)-0.5,1.5,ALLEGRO_PLAYMODE_ONCE,0);
-				this.Score += 250;
+				this.ModifyScore(250); 
 				break;
 			
 			case TYPES["ENEMY"]: 
@@ -993,10 +821,8 @@ class Player extends Enemy
 					this.Health -=10;
 					this.gun.Downgrade();
 					this.gun.Regulate();
-
 					if(this.Health<1) { this.Health = 0;}
 				}
-				break;
 		}
 	}
 
@@ -1031,8 +857,8 @@ class Player extends Enemy
 		//Draw triple shield
 		if(this.Shield>2)
 		{
-			Draw_Circle(this.PositionX+this.Width/2,this.PositionY+this.Height/2,35,Color.rgba(0,0,100+RandomInt(1,20),0.3).getString()); //al_draw_filled_circle(PositionX+Width/2,PositionY+Height/2,35,al_map_rgba(0,0,100+rand()%20,5));
-			Draw_Circle(this.PositionX+this.Width/2,this.PositionY+this.Height/2,36,Color.rgba(60,120+RandomInt(1,80),255,0.3).getString(),false); //al_draw_circle(PositionX+Width/2,PositionY+Height/2,36,al_map_rgba(60,120+rand()%80,255,128),2);
+			Draw_Circle(this.PositionX+this.Width/2,this.PositionY+this.Height/2,35,Color.rgba(0,0,100+RandomInt(1,20),0.3).getString()); 
+			Draw_Circle(this.PositionX+this.Width/2,this.PositionY+this.Height/2,36,Color.rgba(60,120+RandomInt(1,80),255,0.3).getString(),false);
 		}
 
 		//Draw double shield
@@ -1058,17 +884,27 @@ class Player extends Enemy
 
 	Draw2()
 	{
-		ctx.drawImage(Resources.Images["HEALTH"],15,SH-30);
-		ctx.drawImage(Resources.Images["HEALTH"],150,SH-30);
-
 		var h = (this.Health/this.MaxHealth)*111;
 		var p = (this.Power/this.MaxPower)*111;
 		
+		//black border
+		Draw_Rect(15,SH-30,117,17,"#111111");
+		Draw_Rect(150,SH-30,117,17,"#111111");
+		
+		//white border
+		Draw_Rect(16,SH-29,115,15,"#ffffff");
+		Draw_Rect(151,SH-29,115,15,"#ffffff");
+		
+		//red interior
+		Draw_Rect(18,SH-27,111,11,Color.rgb(255,0,0).getString());
+		Draw_Rect(153,SH-27,111,11,Color.rgb(255,0,0).getString());
+		
+		//health bar, power bar
 		Draw_Rect(18,SH-27,h,11,Color.rgb(0,255,0).getString());
 		Draw_Rect(153,SH-27,p,11,Color.rgb(255,100,0).getString());
 
-		Draw_Text("16px tahoma","rgb(255,255,255)", 290, SH-16, "SCORE: "+this.Score);
-		Draw_Text("16px tahoma","rgb(255,255,255)", 5, 16, "LEVEL: "+Level+"    KILLS: "+Combo);
+		Draw_Text("16px tahoma","#ffffff", 290, SH-16, "SCORE: "+this.Score);
+		Draw_Text("16px tahoma","#ffffff", 5, 16, "LEVEL: "+Level+"    KILLS: "+Kills+"    COMBO: "+Combo);
 	}
 }
 
@@ -1093,17 +929,36 @@ class GamePlayScreen
 	}
 	
 	//CONVENIENT GENERIC FUNCTION TO UPDATE OBJECT ARRAYS
-	UpdateArray(array)
+	UpdateArray(array,col=false)
 	{
 		for(var i = 0; i<array.length; i++)
 		{
 			if(array[i].Active) 
 			{ 
 				array[i].Update(); 
-				if(array[i].IntersectsWith(this.player))
+				
+				//if array item is of enemy type then shoot
+				if(array[i].Type==TYPES["ENEMY"])
+				{
+					var b = this.Enemies[i].Shoot();
+					if(b.State!=STATES["NULL"] && b.PositionX<SW)
+					{
+						Play_Sound(Resources.Sounds["LASERSHOT"],0.3);//al_play_sample(LaserShot,0.3,Enemies[i].GetPositionX()/float(SW)-0.5,3.0,ALLEGRO_PLAYMODE_ONCE,NULL);
+						this.BadBullets.push(b);
+					}
+				}
+				
+				//check and handle collisions if necesary
+				if(col==true && array[i].IntersectsWith(this.player))
 				{
 					this.player.HandleCollision(array[i]);
-					array.HandleCollision();
+					console.log(array[i].Type+"  "+array[i].Sate);
+					array[i].HandleCollision();
+					//add explotion if array item is a bad bullet
+					if(array[i].Type==TYPES["BULLET"] && array[i].State==STATES["BAD"])
+					{
+						this.Explosions.push(new Explosion(this.player.PositionX,this.player.PositionY,STATES["GOOD"]));
+					}
 				}
 			}
 			else { array.splice(i,1); }
@@ -1163,99 +1018,27 @@ class GamePlayScreen
 		this.player.Update();
 		this.bg.Update();
 		
+		//generate new enemies
 		if(RandomInt(0,(303-(Level*3)))<5)
 		{	
 			this.Enemies.push(new Enemy());
 		}
-
+		
+		//count frames to determine level
 		this.frames = (this.frames+1)%500;
-
 		if(this.frames == 0)
 		{
 			Level++;
 			if(Level>99) Level = 99;
 		}
 
-		//UPDATE GOOD BULLETS
-		for(var i = 0; i<this.GoodBullets.length; i++)
-		{
-			if(this.GoodBullets[i].Active) 
-			{ 
-				this.GoodBullets[i].Update(); 
-			}
-			else { this.GoodBullets.splice(i,1); }
-		}
-
-		//UPDATE POWER UPS
-		for(var i = 0; i<this.PowerUps.length; i++)
-		{
-			if(this.PowerUps[i].Active)
-			{
-				this.PowerUps[i].Update();
-				if(this.PowerUps[i].IntersectsWith(this.player) && this.player.Health>0)
-				{
-					this.player.HandleCollision(this.PowerUps[i]);
-					this.PowerUps[i].HandleCollision();
-				}
-			}
-			else { this.PowerUps.splice(i,1); }
-		}
-
-		//UPDATE CONIS
-		for(var i = 0; i<this.Coins.length; i++)
-		{
-			if(this.Coins[i].Active)
-			{
-				this.Coins[i].Update();
-
-				if(this.Coins[i].IntersectsWith(this.player) && this.player.Health>0)
-				{
-					this.player.HandleCollision(this.Coins[i]);
-					this.Coins[i].HandleCollision();
-				}
-			}
-			else { this.Coins.splice(i,1); }
-		}
-
-		//UPDATE ENEMIES
-		for(var i = 0; i<this.Enemies.length; i++)
-		{
-			if(this.Enemies[i].Active)
-			{
-				this.Enemies[i].Update();
-				var b = this.Enemies[i].Shoot();
-				if(b.State!=STATES["NULL"] && b.PositionX<SW)
-				{
-					Play_Sound(Resources.Sounds["LASERSHOT"],0.3);//al_play_sample(LaserShot,0.3,Enemies[i].GetPositionX()/float(SW)-0.5,3.0,ALLEGRO_PLAYMODE_ONCE,NULL);
-					this.BadBullets.push(b);
-				}
-			}
-			else{ this.Enemies.splice(i,1); }
-		}
-
-		//UPDATE EXPLOSIONS
-		for(var i = 0; i<this.Explosions.length; i++)
-		{
-			if(this.Explosions[i].Active) { this.Explosions[i].Update(); }
-			else { this.Explosions.splice(i,1); }
-		}
-
-		//UPDATE BAD BULLETS
-		for(var i = 0; i<this.BadBullets.length; i++)
-		{
-			if(this.BadBullets[i].Active)
-			{
-				this.BadBullets[i].Update();
-
-				if(this.BadBullets[i].IntersectsWith(this.player))
-				{
-						this.player.HandleCollision(this.BadBullets[i]);
-						this.BadBullets[i].HandleCollision();
-						this.Explosions.push(new Explosion(this.player.PositionX,this.player.PositionY,STATES["GOOD"]));
-				}
-			}
-			else { this.BadBullets.splice(i,1); }
-		}
+		//UPDATE GAME OBJECTS
+		this.UpdateArray(this.GoodBullets);
+		this.UpdateArray(this.PowerUps,true);
+		this.UpdateArray(this.Coins,true);
+		this.UpdateArray(this.Enemies);
+		this.UpdateArray(this.Explosions);
+		this.UpdateArray(this.BadBullets,true);
 
 		//CHECK FOR COLLISIONS
 		for(var j = 0; j<this.Enemies.length; j++)
@@ -1270,8 +1053,8 @@ class GamePlayScreen
 						if(this.Enemies[j].IntersectsWith(this.GoodBullets[i]))
 						{
 							Play_Sound(Resources.Sounds["PUNCH"]);
-							this.player.Score += ((this.Enemies[j].Value())+Combo);
-							this.Enemies[j].HandleCollision(TYPES["BULLET"]);
+							this.player.ModifyScore((this.Enemies[j].Value())+(Combo*10));
+							this.Enemies[j].HandleCollision(this.GoodBullets[i]);
 							this.GoodBullets[i].HandleCollision();
 							this.Explosions.push(new Explosion(this.Enemies[j].PositionX,this.Enemies[j].PositionY,STATES["BAD"]));
 							switch(RandomInt(1,4))
@@ -1285,7 +1068,7 @@ class GamePlayScreen
 				//check collision with player
 				if(this.Enemies[j].IntersectsWith(this.player))
 				{
-					this.Enemies[j].HandleCollision(this.player.Type);
+					this.Enemies[j].HandleCollision(this.player);
 					this.player.HandleCollision(this.Enemies[j]);
 					this.Explosions.push(new Explosion(this.Enemies[j].PositionX,this.Enemies[j].PositionY,STATES["BAD"]));
 				}
@@ -1297,13 +1080,13 @@ class GamePlayScreen
 	Draw()
 	{
 		this.bg.Draw();
-		for(var i = 0; i<this.Enemies.length; i++) {  this.Enemies[i].Draw(); }
+		this.DrawArray(this.Enemies);
 		this.player.Draw();
-		for(var i = 0; i<this.PowerUps.length; i++) { this.PowerUps[i].Draw(); }
-		for(var i = 0; i<this.Coins.length; i++) { this.Coins[i].Draw(); }
-		for(var i = 0; i<this.GoodBullets.length; i++) { this.GoodBullets[i].Draw(); }
-		for(var i = 0; i<this.BadBullets.length; i++) { this.BadBullets[i].Draw(); }
-		for(var i = 0; i<this.Explosions.length; i++) { this.Explosions[i].Draw(); }
+		this.DrawArray(this.PowerUps);
+		this.DrawArray(this.Coins);
+		this.DrawArray(this.GoodBullets);
+		this.DrawArray(this.BadBullets);
+		this.DrawArray(this.Explosions);
 		this.player.Draw2();
 	}
 	
@@ -1320,6 +1103,7 @@ class GamePlayScreen
 		this.frames = 0;
 		Level = 1;
 		Combo = 0;
+		Kills = 0;
 	}
 }
 
@@ -1337,7 +1121,7 @@ class GameOverScreen
 			ResetKeys();
 		}
 	}
-	Draw() { ctx.drawImage(Resources.Images["GAMEOVER"],0,0); }
+	Draw() { ctx.drawImage(Resources.Images["BACKGROUND"],0,800,800,400,0,0,800,400); }
 };
 
 //TITLE SCREEN CLASS DECLARATION//
@@ -1364,7 +1148,7 @@ class TitleScreen
 
 	HandleInput()
 	{
-		if(KEYS[KName["Space"]] || KEYS[KName["Enter"]] || TOUCHING[0] || TOUCHING[1])
+		if(KEYS[KName["Space"]] || KEYS[KName["Enter"]])
 		{
 			GameState = GAME_STATES["GAMEPLAY"];
 			Play_Sound(Resources.Sounds["GUNSHOT"]);
@@ -1376,43 +1160,23 @@ class TitleScreen
 
 	Draw()
 	{
-		ctx.drawImage(Resources.Images["TITLE"],0,0);
+		ctx.drawImage(Resources.Images["BACKGROUND"],0,0,800,400,0,0,800,400);
 		ctx.globalAlpha = (this.Transition/255);
 		ctx.drawImage(Resources.Images["PRESS_START"],480,300);
 		ctx.globalAlpha = 1;
 	}
 }
 
-//GAME SCREEN MANAGER CLASS DECLARATION//
-var GameScreens = new Array();
-class ScreenManager
+//GAME SCREEN MANAGER DECLARATION//
+var ScreenManager = 
 {
-	static AddScreen(newScreen)
-	{
-		GameScreens.push(newScreen);
-	}
-	
-	static HandleInput()
-	{
-		GameScreens[GameState].HandleInput();
-	}
-	
-	static Update(d)
-	{
-		GameScreens[GameState].Update(d);
-	}
-	
-	static Draw()
-	{
-		ctx.clearRect(0, 0, SW, SH);
-		GameScreens[GameState].Draw();
-	}
-	
-	static Reset(screenID)
-	{
-		GameScreens[screenID].Reset();
-	}
-}
+	GameScreens: new Array(),
+	AddScreen: function(newScreen) { this.GameScreens.push(newScreen); },
+	HandleInput: function(newScreen) { this.GameScreens[GameState].HandleInput(); },
+	Update: function(d) { this.GameScreens[GameState].Update(); },
+	Draw: function(){ ctx.clearRect(0, 0, SW, SH); this.GameScreens[GameState].Draw(); },
+	Reset: function(screenID){ this.GameScreens[screenID].Reset(); }
+};
 
 //PAUSE SCREEN CLASS DELARATION
 class PauseScreen
@@ -1469,7 +1233,7 @@ class PauseScreen
 
 	Draw()
 	{
-		ctx.drawImage(Resources.Images["PAUSE"],0,0);
+		ctx.drawImage(Resources.Images["BACKGROUND"],0,400,800,400,0,0,800,400);
 		Draw_Rect(530,200+64*(this.menu),200,48,Color.rgb(255,50+RandomInt(1,60),0).getString(),false);
 		Draw_Rect(532,202+64*(this.menu),196,44,Color.rgb(255,50+RandomInt(1,60),0).getString(),false);
 	}
@@ -1481,19 +1245,17 @@ ScreenManager.AddScreen(new GamePlayScreen());
 ScreenManager.AddScreen(new PauseScreen());
 ScreenManager.AddScreen(new GameOverScreen());
 
-//FUNCTION THAT STARTS THEGAME
+//FUNCTION THAT STARTS THE GAME
 function Start_Game()
 {
-//START PLAYING THE TITLE MUSIC
-Play_Sound(Resources.Sounds["TITLE_MUSIC"],1,true);
-// Start things off
-requestAnimationFrame(GameLoop);
+	Play_Sound(Resources.Sounds["TITLE_MUSIC"],1,true); //START PLAYING THE TITLE MUSIC
+	requestAnimationFrame(GameLoop); //START THE GAME
 }
 
 //THIS IS THE GAME LOOP
 function GameLoop(timestamp)
 {
-    // Throttle the frame rate.    
+    //Throttle the frame rate.   
     if (timestamp < lastFrameTimeMs + (1000 / maxFPS)) 
 	{
         requestAnimationFrame(GameLoop);
@@ -1527,7 +1289,5 @@ function GameLoop(timestamp)
     requestAnimationFrame(GameLoop);
 }
 
-//LOAD GAME RESOURCES//
-//then start the game//
+//LOAD GAME RESOURCES FIRST, THEN START THE GAME//
 Resources.Load();
-
