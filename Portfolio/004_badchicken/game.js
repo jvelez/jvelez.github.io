@@ -173,39 +173,77 @@ class Gun
 	{
 		this.FirePower = 2;
 		this.FireRate = 5;
+		this.ReloadTime = 75;  //in frames
+		this.MaxBullets = 10;
+		this.TotalBullets = 100;
+		this.Bullets = 10;
+		this.Automatic = false; 
 		this.DelayTimer = 0;  
-		this.Fire = false;
+		this.Fire = false; 
+		this.NoReload = true;
 		this.Barrels = 1;
 	}
 
 	Shoot() 
 	{ 
-		if(this.DelayTimer<=0)
+		if(!this.FireRate)
 		{
-			this.DelayTimer = Math.floor(FPS/this.FireRate);
-			this.Fire = true;
-			return true;
+			return false;
 		}
-		else return false;
+		if(this.NoReload)
+		{
+			if(this.DelayTimer<=0 && (this.Automatic? true : !this.Fire))
+			{
+				this.DelayTimer = Math.floor(FPS/this.FireRate);
+				this.Fire = true;
+				return true;
+			}
+		}
+		else
+		{
+			if(this.DelayTimer<=0 && this.Bullets>0 && (this.Automatic? true : !this.Fire))
+			{
+				this.Bullets--;
+				this.DelayTimer = FPS/this.FireRate;
+				this.Fire = true;
+				return true;
+			}
+		}
+		return false;  
 	}
-	
+        
+    CeaseFire() { this.Fire = false; }
+        
     IsReady() { return this.DelayTimer == 0; }
         
     Update() { this.DelayTimer--; }
-
-    UpgradeFireRate() { this.FireRate++; Cap(this.FireRate,5,MAX_FIRE_RATE);  }
-    UpgradeFirePower() { this.FirePower++; Cap(this.FirePower,2,MAX_FIRE_POWER); }
-	UpgradeBarrels() { this.Barrels++; Cap(this.Barrels,1,MAX_BARRELS); }
-	
-	Regulate()
-	{
-		Cap(this.FireRate,5,MAX_FIRE_RATE);
-		Cap(this.FirePower,2,MAX_FIRE_POWER);
-		Cap(this.Barrels,1,MAX_BARRELS);
+        
+	Reload() 
+	{ 
+		this.Bullets = ((this.TotalBullets<this.MaxBullets)? this.TotalBullets : this.MaxBullets);
+		this.TotalBullets -= this.MaxBullets;
+		if(this.TotalBullets<0){ this.TotalBullets = 0; }
 	}
-
+        
+    AddBullets(bn) { this.TotalBullets += bn; }
+    UpgradeFireRate() { this.FireRate++; }
+    UpgradeFirePower() { this.FirePower++; }
+    UpgradeReloadTime() { this.ReloadTime--; if(this.ReloadTime<MIN_RELOAD_TIME){ this.ReloadTime = MIN_RELOAD_TIME;} }
+    UpgradeMaxBullets() { this.MaxBullets++; }
+    UpgradeAutomatic() { this.Automatic = true; }
+	UpgradeBarrels() { this.Barrels++; }
+	
+	MaxUpgrades()
+	{
+		this.FireRate = MAX_FIRE_RATE;
+		this.FirePower = MAX_FIRE_POWER;
+		this.ReloadTime = MIN_RELOAD_TIME;
+		this.MaxBullets = MAX_MAX_BULLETS; 
+	}
+		
 	Reset(fp = 2)
 	{ 
+		this.Automatic = true;
 		this.FireRate = 5; 
 		this.FirePower = fp;
 		this.Barrels = 1;
@@ -216,6 +254,13 @@ class Gun
 		this.FireRate--;
 		this.FirePower--;
 		this.Barrels--;
+	}
+
+	Regulate()
+	{
+		this.FireRate = Cap(this.FireRate,5,MAX_FIRE_RATE);
+		this.FirePower = Cap(this.FirePower,2,MAX_FIRE_POWER);
+		this.Barrels = Cap(this.Barrels,1,MAX_BARRELS);
 	}
 };
 
@@ -806,6 +851,7 @@ class Player extends Enemy
 					case 3: this.Health+=15; if(this.Health>this.MaxHealth){this.Health=this.MaxHealth;} break; //HEALTH+
 					case 4: this.gun.UpgradeBarrels(); break; //BARREL+
 				}
+				this.gun.Regulate();
 				break;
 
 			case TYPES["COIN"]: 
