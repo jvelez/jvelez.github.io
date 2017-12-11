@@ -196,6 +196,13 @@ class Gun
     UpgradeFireRate() { this.FireRate++; Cap(this.FireRate,5,MAX_FIRE_RATE);  }
     UpgradeFirePower() { this.FirePower++; Cap(this.FirePower,2,MAX_FIRE_POWER); }
 	UpgradeBarrels() { this.Barrels++; Cap(this.Barrels,1,MAX_BARRELS); }
+	
+	Regulate()
+	{
+		Cap(this.FireRate,5,MAX_FIRE_RATE);
+		Cap(this.FirePower,2,MAX_FIRE_POWER);
+		Cap(this.Barrels,1,MAX_BARRELS);
+	}
 
 	Reset(fp = 2)
 	{ 
@@ -739,13 +746,11 @@ class Player extends Enemy
 
 		if(this.powerTimer<1) { this.Power -= 0.3; }
 		else { this.Power -= 2; }
-		
+
 		if(this.Power<1) { this.Power = 1; }
 
 		if(this.Power>this.MaxPower)
 		{
-			//gun.Downgrade();
-			//gun.Regulate();
 			this.powerTimer = 50;
 		}
 		
@@ -763,6 +768,7 @@ class Player extends Enemy
 
 		//update the gun
 		this.gun.Update();
+		
 		this.frameDelay++;
 		if(this.frameDelay>1){ this.frame = (this.frame+1)%9; this.frameDelay = 0; }
 	}
