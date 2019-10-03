@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+	<title>🐓Bad Chicken!🐓</title>
+	<link rel="shortcut icon" href="assets/roast.png" />
+    <style>
+    	 * { 
+			padding: 0; 
+			margin: 0;
+			background: black;
+			text-align:center;
+		}
+
+        canvas 
+		{ 
+			display: inline;
+			margin: 0 auto; 
+			border: 1px solid black; 
+			width: 96%;
+			height: 96%;
+			z-index: -1000;
+		}
+
+		button {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translateX(-50%);
+			border: 2px solid orangered;
+			z-index: 1000;
+			padding: 1rem;
+			border-radius: 6px;
+			color: orangered;
+			font-size: 2rem;
+			cursor: pointer;
+		}
+    </style>
+</head>
+<body">
+	<div style="width: 100%; text-align:center;">
+		<canvas id="myCanvas" width="800" height="400"></canvas>
+	</div>
+	<!-- Need at least on user interaction before browser allows playing sounds -->
+	<button id="start-button" onclick="Start_Game()">
+		🐓 PLAY GAME 🐓
+	</button>
+	<p style="text-align:center; color: #777d7d; font-family:tahoma">coded by: Jonathan Velez  - Move: Arrows, Shoot/Start: Spacebar/Enter, Pause/Cancel: B/Esc</p>
+	<script src="game.js"></script>
+</body>
+</html>
